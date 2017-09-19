@@ -17,11 +17,10 @@ stdenv.mkDerivation rec {
                      "--with-initial-vt=7"
                      "--with-systemdsystemunitdir=$(out)/etc/systemd/system" ];
 
-  nativeBuildInputs = [ autoreconfHook pkgconfig ];
-  buildInputs = [ glib itstool libxml2 intltool
-                  accountsservice gnome3.dconf systemd
+  nativeBuildInputs = [ pkgconfig libxml2 itstool intltool autoreconfHook libtool gnome3.dconf ];
+  buildInputs = [ glib accountsservice systemd
                   gobjectIntrospection libX11 gtk
-                  libcanberra_gtk3 pam libtool plymouth librsvg ];
+                  libcanberra_gtk3 pam plymouth librsvg ];
 
   enableParallelBuilding = true;
 
@@ -30,6 +29,11 @@ stdenv.mkDerivation rec {
               ./gdm-x-session_extra_args.patch
               ./gdm-session-worker_xserver-path.patch
              ];
+
+  postInstall = ''
+    # Prevent “Could not parse desktop file orca-autostart.desktop or it references a not found TryExec binary”
+    rm $out/share/gdm/greeter/autostart/orca-autostart.desktop
+  '';
 
   installFlags = [ "sysconfdir=$(out)/etc" "dbusconfdir=$(out)/etc/dbus-1/system.d" ];
 
